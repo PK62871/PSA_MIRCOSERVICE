@@ -320,3 +320,135 @@ management:
 
 Step 7: Test using this url: http://localhost:8085/fromsecondcontroller
 #########################################################################################################################
+
+
+
+#################################################
+Load Balancer Demonstration in microservices
+#################################################
+
+In microservice 1 remove port number and start the application on different port using Spring--> run configurations--->arguments---> -Dserver.port=8082 etc
+
+# Basic Info
+spring.application.name=my-service
+#server.port=8081-------> remove this
+
+# Eureka - Optional if you are running eureka on port 8671
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+# Admin Server
+spring.boot.admin.client.url=http://localhost:8080
+management.endpoints.web.exposure.include=*
+
+# Zipkin - Optional to mention. It will register with ZIPKIN Automatically
+spring.zipkin.base-url=http://localhost:9411
+spring.sleuth.sampler.probability=1.0
+
+
+In Spring Cloud, Feign Client integrates with Ribbon to provide client-side load balancing. Here’s an explanation of how Feign and Ribbon work together. This is auto configured. No extra configuration is required
+
+
+########################
+Why API gateway?
+##################
+1. Simplified Client Communication: Clients (mobile apps, web apps) only need to interact with one API endpoint (the API Gateway) rather than multiple microservices.
+
+2. Decoupling: It decouples the client from the internal workings of the microservices. The client doesn't need to know how the services are structured or how they communicate internally.
+
+3. Centralized Management: It centralizes concerns like security, authentication, and logging
+
+How to implement API gateway:
+----------------------------
+
+Step 1 create APi gateway Spring boot project with following dependencies
+-------------------------------------------------------------------------
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+Step 2: Mention routing in yaml file
+--------------------------------------------
+server:
+  port: 5555
+  
+spring:
+  application:
+    name: API-Gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: microservice-api-1
+          uri: lb://MICROSERVICES-1
+          predicates:
+            - Path=/micro1/**
+          filters:
+            - RewritePath=/micro1/(?<segment>.*), /${segment}
+        
+        - id: microservice-api-3
+          uri: lb://MICROSERVICES-3
+          predicates:
+            - Path=/micro3/**
+          filters:
+            - RewritePath=/micro3/(?<segment>.*), /${segment}
+
+Step 3: Register with eureka server
+-----------------------------------
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ApiGatewayApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ApiGatewayApplication.class, args);
+	}
+
+}
+
+Step 4: Perform testing:
+http://localhost:5555/micro3/fromsecondcontroller
+
+################################################################################################
+
+################################################
+✅ What is a Spring Cloud Config Server?
+################################################
+
+Spring Cloud Config Server is a central configuration management server that allows you to store, manage, and serve external configurations for all your microservices from a single location — typically from a Git repository or file system.
+
+🔧 Why is it needed?
+------------------------------------
+-> In a microservices architecture:
+-> Each service may have different configuration (ports, DB URLs, API keys).
+-> You may want to change config without redeploying the service.
+-> Managing configs across dozens of services becomes a nightmare.
+
+💡 Key Features:
+----------------------------------------
+Feature				Description
+Centralized config	All services fetch config from one place
+
+###########################################
+How to secure microservice prject?
+##############################################
+Step 1: Create AuthService with Spring Security & JWT Token
+Step 2: When you login it should generate JWT Token
+Step 3: Verify the Token in API Gateway using JwtAuthenticationFilter implements GlobalFilter class
+Step 4:  Inside Filter method verify the token
+
+
+
+
+
+
