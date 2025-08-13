@@ -68,8 +68,11 @@ public class AppSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity)throws Exception{
 
         httpSecurity
-                .authorizeHttpRequests(auth->auth.requestMatchers(allOpenUrl).permitAll().anyRequest().authenticated())
-                .csrf().disable(); //.httpBasic();
+                .authorizeHttpRequests(auth->auth.requestMatchers(allOpenUrl).permitAll()
+                        .requestMatchers("/api/v1/welcome/get").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("api/v1/welcome/admin").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .csrf().disable().httpBasic();
         return httpSecurity.build();
     }
 

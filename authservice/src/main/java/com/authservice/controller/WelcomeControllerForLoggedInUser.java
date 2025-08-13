@@ -9,8 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class WelcomeControllerForLoggedInUser {
 
 
+    //That endpoint can access anyone (for all roles).............................
     @GetMapping("/get")
     public String welcome(){
         return "Welcome";
+    }
+
+    //That endpoint will only for ADMIN Roles.................
+    @GetMapping("/admin")
+    public String adminWelcome(){
+        return "Welcome Admin";
     }
 }

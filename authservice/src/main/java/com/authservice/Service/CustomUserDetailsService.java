@@ -4,6 +4,7 @@ package com.authservice.Service;
 import com.authservice.Entity.User;
 import com.authservice.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         //find username from user table...........
         User user = userRepository.findByUsername(username);
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(), Collections.emptyList());
+        //User Object is returning with only Username and Password but not the role.............
+        //return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(), Collections.emptyList());
+
+        //User Object is returning with only Username and Password and  the role.............
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(), Collections.singleton(new SimpleGrantedAuthority(user.getRole())));
+
     }
 }

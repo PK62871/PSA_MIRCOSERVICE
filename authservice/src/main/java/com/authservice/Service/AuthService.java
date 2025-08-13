@@ -54,6 +54,7 @@ public class AuthService {
         User user = new User();
         BeanUtils.copyProperties(userDto, user);
         user.setPassword(encryptedPassword);
+        user.setRole("ROLE_ADMIN");
 
         //Finally Save user and return API Response..............
         User savedUser = userRepository.save(user);
