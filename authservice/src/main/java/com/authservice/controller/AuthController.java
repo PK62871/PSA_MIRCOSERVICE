@@ -4,6 +4,7 @@ import com.authservice.DTO.APIResponse;
 import com.authservice.DTO.LoginDto;
 import com.authservice.DTO.UserDto;
 import com.authservice.Service.AuthService;
+import com.authservice.Service.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,10 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+
+    @Autowired
+    private JWTService jwtService;
 
 //    //URL :- http://localhost:8080/api/v1/auth/welcome
 //    //Open URL
@@ -103,9 +108,13 @@ If credentials don’t match → throws BadCredentialsException.
             Authentication authenticated = authenticationManager.authenticate(token);
 
             if (authenticated.isAuthenticated()){
+
+                //Generate Token for that user..................
+                String jwtToken = jwtService.generateJwtToken(loginDto.getUsername(), authenticated.getAuthorities().iterator().next().getAuthority());
+
                 response.setMessage("Login Successfully");
                 response.setStatus(200);
-                response.setData("User has logged");
+                response.setData(jwtToken);
 
                 return new ResponseEntity<>(response,HttpStatusCode.valueOf(response.getStatus()));
             }
