@@ -14,6 +14,8 @@ public class JWTService {
     private static final long EXPIRATION_TIME = 86400000; // 1 day
 
 
+
+    //Call this method to generate token once username and password is correct..........
     public String generateJwtToken(String username,String role){
         return JWT.create()
                 .withSubject(username)
@@ -22,5 +24,13 @@ public class JWTService {
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC256(SECRET_KEY));
 
+    }
+
+    // Method to validate the token........... and retrieve the username....
+    public String validateTokenAndRetrieveSubject(String token){
+        return JWT.require(Algorithm.HMAC256(SECRET_KEY))
+                .build()
+                .verify(token)
+                .getSubject();
     }
 }

@@ -78,6 +78,8 @@ public class AppSecurityConfig {
                         .requestMatchers("api/v1/welcome/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf().disable();//.httpBasic();
+
+        //Adding our custom filter so that will run 1st before default filter
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
 

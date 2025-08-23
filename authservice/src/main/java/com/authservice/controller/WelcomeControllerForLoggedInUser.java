@@ -15,16 +15,21 @@ public class WelcomeControllerForLoggedInUser {
     //That endpoint can access anyone (for all roles).............................
     @GetMapping("/get")
     public String welcome(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object details = authentication.getDetails();
-        System.out.println(details.toString());
 
-        return "Welcome";
+        //Get the name of logged-in user from SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+
+        return "Welcome " + name;
     }
 
     //That endpoint will only for ADMIN Roles.................
     @GetMapping("/admin")
     public String adminWelcome(){
-        return "Welcome Admin";
+
+        //Get the name of logged-in user from SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+        return "Welcome Admin " + name;
     }
 }
